@@ -147,7 +147,7 @@ HireSense_AI/
 
 1. **Clone the repository**
    ```bash
-   git clone <your-repository-url>
+   git clone https://github.com/Ishaq7892/Rooman_HireSense-AI.git
    cd HireSense_AI
    ```
 
@@ -287,7 +287,7 @@ Combined_Score =
 ## 📈 Screenshots
 
 ### Dashboard
-![Dashboard](https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=professional%20recruiter%20dashboard%20with%20stat%20cards%20and%20gradient%20design&image_size=square)
+![Dashboard](assets/dashboard.png)
 
 ### Candidate Ranking
 ![Candidate Ranking](https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=candidate%20ranking%20page%20with%20scores%20and%20top%20candidate%20highlighted&image_size=square)
