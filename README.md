@@ -294,10 +294,25 @@ Combined_Score =
 ![Dashboard](assets/dashboard.png)
 
 ### Candidate Ranking
-![Candidate Ranking](https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=candidate%20ranking%20page%20with%20scores%20and%20top%20candidate%20highlighted&image_size=square)
+![Candidate Ranking](assets/Candidate_ranking.png)
 
 ### Candidate Details
-![Candidate Details](https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=candidate%20profile%20page%20with%20interview%20questions&image_size=square)
+![Candidate Details](assets/Candidate_detail.png)
+
+### Upload job discription
+![Upload job discription](assets/Upload_JD.png)
+
+### Upload Resume
+![Upload Resume](assets/Upload_resume.png)
+
+### Recruitment Analiysis
+![Recruitment Analiysis](assets/recruitment_analiysis.png)
+
+### Skill Gap
+![Skill Gap](assets/Skill_Gap.png)
+
+### Setting 
+![Setting ](assets/Setting.png)
 
 ---
 
