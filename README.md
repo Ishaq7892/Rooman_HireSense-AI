@@ -199,11 +199,15 @@ EMBEDDING_MODEL=all-MiniLM-L6-v2
 
 ---
 
-## 🚀 Usage
+## 🚀 TO RUN THE APPLICATION
 
 ### 1. Start the Backend Server
 ```bash
-python -m backend.main
+# Using Uvicorn (recommended, with auto-reload)
+python -m uvicorn backend.main:app --reload
+
+# Or without auto-reload
+python -m uvicorn backend.main:app
 ```
 The FastAPI backend will start at: http://localhost:8000
 
@@ -214,7 +218,7 @@ In a new terminal:
 ```bash
 streamlit run frontend/app.py
 ```
-The Streamlit dashboard will open at: http://localhost:8501
+The Streamlit dashboard will open at: http://localhost:8502 (the exact port will be shown in the terminal)
 
 ---
 

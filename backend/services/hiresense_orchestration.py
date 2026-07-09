@@ -37,6 +37,7 @@ class HireSenseOrchestration:
         self.jd_store = {}  # jd_id -> (raw_text, structured_data)
         self.resume_store = {}  # resume_id -> (raw_text, structured_data)
         self.candidates = {}  # jd_id -> List[CandidateData]
+        self.ranking_results = {}  # jd_id -> RankingResponse
         
         logger.info("HireSenseOrchestration initialized")
 
@@ -160,6 +161,9 @@ class HireSenseOrchestration:
                 similarity_weight=similarity_weight
             )
             
+            # Store in cache
+            self.ranking_results[jd_id] = ranking_response
+            
             logger.info(f"Successfully ranked {len(candidates)} candidates")
             return ranking_response
         except Exception as e:
@@ -181,7 +185,16 @@ class HireSenseOrchestration:
             logger.info(f"Getting candidate details for resume ID: {resume_id}")
             
             if resume_id not in self.resume_store:
-                raise ValueError(f"Resume with ID {resume_id} not found")
+                import json
+                file_path = Path(__file__).resolve().parent.parent.parent / "data" / "resumes" / f"{resume_id}_structured.json"
+                if file_path.exists():
+                    logger.info(f"Loading resume {resume_id} from disk")
+                    with open(file_path, "r", encoding="utf-8") as f:
+                        data = json.load(f)
+                    structured_data = StructuredResume(**data)
+                    self.resume_store[resume_id] = ("", structured_data)
+                else:
+                    raise ValueError(f"Resume with ID {resume_id} not found")
             
             raw_text, structured_data = self.resume_store[resume_id]
             
@@ -199,34 +212,97 @@ class HireSenseOrchestration:
             }
             
             # If JD ID is provided, get ranking info too
-            if jd_id and jd_id in self.jd_store:
-                # Find candidate in candidates list
-                if jd_id in self.candidates:
+            if jd_id:
+                # Load job description from disk if missing from memory
+                if jd_id not in self.jd_store:
+                    import json
+                    file_path = Path(__file__).resolve().parent.parent.parent / "data" / "job_descriptions" / f"{jd_id}_structured.json"
+                    if file_path.exists():
+                        logger.info(f"Loading job description {jd_id} from disk")
+                        with open(file_path, "r", encoding="utf-8") as f:
+                            data = json.load(f)
+                        jd_structured = StructuredJobDescription(**data)
+                        self.jd_store[jd_id] = ("", jd_structured)
+                        self.candidates[jd_id] = []
+                
+                if jd_id in self.jd_store:
+                    # Find candidate in candidates list and associate if not already present
+                    if jd_id not in self.candidates:
+                        self.candidates[jd_id] = []
+                    
                     candidate_found = None
                     for candidate in self.candidates[jd_id]:
                         if candidate.document_id == resume_id:
                             candidate_found = candidate
                             break
-                    if candidate_found:
-                        # Generate interview questions for this candidate
-                        jd_raw, jd_structured = self.jd_store[jd_id]
-                        
-                        # Get missing skills
-                        missing_skills = []
-                        for skill in jd_structured.required_skills:
-                            if skill not in structured_data.skills:
-                                missing_skills.append(skill)
-                        
-                        interview_questions = self.interview_generator.generate_questions(
-                            InterviewQuestionRequest(
-                                candidate_name=structured_data.name,
-                                structured_resume=structured_data,
-                                structured_job_description=jd_structured,
-                                missing_skills=missing_skills
-                            )
+                    
+                    if not candidate_found:
+                        candidate_found = CandidateData(
+                            document_id=resume_id,
+                            raw_text=raw_text,
+                            structured_data=structured_data
                         )
-                        
-                        candidate_details["interview_questions"] = interview_questions
+                        self.candidates[jd_id].append(candidate_found)
+
+                    # Check if we have cached ranking results
+                    strengths = []
+                    weaknesses = []
+                    ats_score = 0.0
+                    similarity_score = 0.0
+                    combined_score = 0.0
+                    reasoning = ""
+                    
+                    ranking_found = False
+                    if jd_id in self.ranking_results:
+                        for r_cand in self.ranking_results[jd_id].ranked_candidates:
+                            if r_cand.document_id == resume_id:
+                                strengths = r_cand.strengths
+                                weaknesses = r_cand.weaknesses
+                                ats_score = r_cand.ats_score
+                                similarity_score = r_cand.similarity_score
+                                combined_score = r_cand.combined_score
+                                reasoning = r_cand.reasoning
+                                ranking_found = True
+                                break
+                    
+                    # If not found in cache, calculate ATS score on the fly (but don't cache)
+                    if not ranking_found:
+                        jd_raw, jd_structured = self.jd_store[jd_id]
+                        ats_result = self.candidate_ranking.ats_scoring_service.calculate_ats_score(
+                            resume_structured=structured_data,
+                            jd_structured=jd_structured
+                        )
+                        strengths = ats_result.strengths
+                        weaknesses = ats_result.weaknesses
+                        ats_score = ats_result.total_score
+                        reasoning = ats_result.reasoning
+                    
+                    candidate_details["strengths"] = strengths
+                    candidate_details["weaknesses"] = weaknesses
+                    candidate_details["ats_score"] = ats_score
+                    candidate_details["similarity_score"] = similarity_score
+                    candidate_details["combined_score"] = combined_score
+                    candidate_details["reasoning"] = reasoning
+
+                    # Generate interview questions for this candidate
+                    jd_raw, jd_structured = self.jd_store[jd_id]
+                    
+                    # Get missing skills
+                    missing_skills = []
+                    for skill in jd_structured.required_skills:
+                        if skill not in structured_data.skills:
+                            missing_skills.append(skill)
+                    
+                    interview_questions = self.interview_generator.generate_questions(
+                        InterviewQuestionRequest(
+                            candidate_name=structured_data.name,
+                            structured_resume=structured_data,
+                            structured_job_description=jd_structured,
+                            missing_skills=missing_skills
+                        )
+                    )
+                    
+                    candidate_details["interview_questions"] = interview_questions
             
             logger.info("Retrieved candidate details successfully")
             return candidate_details

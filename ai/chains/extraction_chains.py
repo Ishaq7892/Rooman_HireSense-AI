@@ -22,7 +22,7 @@ class ExtractionChains:
         if settings.GROQ_API_KEY and settings.GROQ_API_KEY != "your_groq_api_key_here":
             try:
                 self.llm = ChatGroq(
-                    model="llama-3.3-70b-versatile",
+                    model=settings.GROQ_MODEL_NAME,
                     temperature=0.7,
                     groq_api_key=settings.GROQ_API_KEY
                 )
@@ -120,28 +120,54 @@ class ExtractionChains:
         # Normalize section headers for matching
         section_headers_lower = [h.lower() for h in section_headers]
         
+        # Define all possible headers to detect boundaries and avoid leaking subsequent sections
+        boundary_headers = [
+            "experience", "work experience", "employment history", "professional experience", "internship", "work history",
+            "education", "academic background", "qualifications", "academic profile", "education history",
+            "projects", "personal projects", "side projects", "key projects", "academic projects",
+            "certifications", "licenses", "courses",
+            "skills", "technical skills", "core skills", "languages", "hobbies", "interests", 
+            "summary", "profile", "about me", "contact"
+        ]
+        
         for i, line in enumerate(lines):
             line_lower = line.strip().lower()
             
-            # Check if we've found a section header
-            is_section_header = False
-            for header in section_headers_lower:
-                if header in line_lower and len(line_lower.split()) < 6:
-                    is_section_header = True
-                    if current_section and current_lines:
-                        # Process the previous section
-                        sections.append({
-                            "raw_content": "\n".join(current_lines).strip()
-                        })
-                    current_section = header
-                    current_lines = []
+            # Check if this line is any section header boundary
+            is_boundary = False
+            matched_header = None
+            for bh in boundary_headers:
+                if bh == line_lower or (bh in line_lower and len(line_lower.split()) < 6):
+                    is_boundary = True
+                    matched_header = bh
                     break
             
-            if not is_section_header and current_section:
-                if line.strip():
-                    current_lines.append(line.strip())
+            if is_boundary:
+                # If we hit a boundary, save the current target section we were collecting
+                if current_section and current_lines:
+                    sections.append({
+                        "raw_content": "\n".join(current_lines).strip()
+                    })
+                    current_lines = []
+                
+                # Check if this boundary header is one of the target headers we want to extract
+                is_target = False
+                for target_h in section_headers_lower:
+                    if target_h in matched_header or matched_header in target_h:
+                        is_target = True
+                        break
+                
+                if is_target:
+                    current_section = matched_header
+                else:
+                    current_section = None
+            else:
+                # If we are currently inside a target section, collect the line
+                if current_section:
+                    if line.strip():
+                        current_lines.append(line.strip())
         
-        # Add the last section
+        # Add the last section if it was a target section
         if current_section and current_lines:
             sections.append({
                 "raw_content": "\n".join(current_lines).strip()
@@ -151,7 +177,7 @@ class ExtractionChains:
     
     def _extract_experience_fallback(self, text: str) -> List[dict]:
         """Fallback experience extraction."""
-        raw_sections = self._extract_section_fallback(text, ["experience", "work experience", "employment history", "professional experience"])
+        raw_sections = self._extract_section_fallback(text, ["experience", "work experience", "employment history", "professional experience", "internship", "work history"])
         experience_list = []
         
         for section in raw_sections:
@@ -243,8 +269,9 @@ class ExtractionChains:
                         result = {}
                 elif isinstance(result, StructuredResume):
                     return result
-                    
-                return StructuredResume(**result)
+                
+                sanitized_result = self._sanitize_resume_dict(result)
+                return StructuredResume(**sanitized_result)
             else:
                 logger.info("Using fallback resume extraction")
                 return StructuredResume(
@@ -259,6 +286,8 @@ class ExtractionChains:
                 )
         except Exception as e:
             logger.error(f"Error extracting resume data: {str(e)}", exc_info=True)
+            if self.llm:
+                raise Exception(f"LLM resume extraction failed: {str(e)}")
             logger.info("Falling back to basic resume extraction")
             return StructuredResume(
                 name=self._extract_name_fallback(text),
@@ -295,8 +324,9 @@ class ExtractionChains:
                         result = {}
                 elif isinstance(result, StructuredJobDescription):
                     return result
-                    
-                return StructuredJobDescription(**result)
+                
+                sanitized_result = self._sanitize_jd_dict(result)
+                return StructuredJobDescription(**sanitized_result)
             else:
                 logger.info("Using fallback job description extraction")
                 return StructuredJobDescription(
@@ -311,6 +341,8 @@ class ExtractionChains:
                 )
         except Exception as e:
             logger.error(f"Error extracting job description data: {str(e)}", exc_info=True)
+            if self.llm:
+                raise Exception(f"LLM job description extraction failed: {str(e)}")
             logger.info("Falling back to basic job description extraction")
             return StructuredJobDescription(
                 job_title="Software Engineer",
@@ -346,7 +378,9 @@ class ExtractionChains:
             return result
         except Exception as e:
             logger.error(f"Error generating ATS reasoning: {str(e)}", exc_info=True)
-            # Fallback to simple reasoning if LLM fails
+            if self.llm:
+                raise Exception(f"LLM ATS reasoning generation failed: {str(e)}")
+            # Fallback to simple reasoning if LLM fails and LLM is not configured
             return {
                 "reasoning": "Score calculated based on skill, experience, education, project, and certification match.",
                 "strengths": [],
@@ -397,6 +431,104 @@ class ExtractionChains:
                     "context": "General background question to start the interview."
                 }
             ]
+
+    def _flatten_to_list_of_strings(self, val) -> List[str]:
+        if val is None:
+            return []
+        if isinstance(val, list):
+            res = []
+            for item in val:
+                if isinstance(item, list):
+                    res.extend(self._flatten_to_list_of_strings(item))
+                elif isinstance(item, dict):
+                    res.extend(self._flatten_to_list_of_strings(list(item.values())))
+                else:
+                    res.append(str(item))
+            return res
+        if isinstance(val, dict):
+            res = []
+            for k, v in val.items():
+                res.extend(self._flatten_to_list_of_strings(v))
+            return res
+        if isinstance(val, str):
+            if "," in val:
+                return [s.strip() for s in val.split(",") if s.strip()]
+            elif "\n" in val:
+                return [s.strip() for s in val.split("\n") if s.strip()]
+            else:
+                return [val.strip()]
+        return [str(val)]
+
+    def _flatten_to_string(self, val) -> str:
+        if val is None:
+            return ""
+        if isinstance(val, list):
+            flat_items = []
+            for item in val:
+                flat_items.append(self._flatten_to_string(item))
+            return "\n".join([x for x in flat_items if x])
+        if isinstance(val, dict):
+            flat_items = []
+            for k, v in val.items():
+                flat_items.append(f"{k}: {self._flatten_to_string(v)}")
+            return "\n".join(flat_items)
+        return str(val)
+
+    def _sanitize_resume_dict(self, result: dict) -> dict:
+        if not isinstance(result, dict):
+            return {}
+            
+        # Standardize experience
+        if "experience" in result and isinstance(result["experience"], list):
+            for exp in result["experience"]:
+                if isinstance(exp, dict) and "description" in exp:
+                    exp["description"] = self._flatten_to_string(exp["description"])
+                        
+        # Standardize education
+        if "education" in result and isinstance(result["education"], list):
+            for edu in result["education"]:
+                if isinstance(edu, dict) and "description" in edu:
+                    edu["description"] = self._flatten_to_string(edu["description"])
+
+        # Standardize projects
+        if "projects" in result and isinstance(result["projects"], list):
+            for proj in result["projects"]:
+                if isinstance(proj, dict):
+                    if "description" in proj:
+                        proj["description"] = self._flatten_to_string(proj["description"])
+                    if "technologies" in proj:
+                        proj["technologies"] = self._flatten_to_list_of_strings(proj["technologies"])
+
+        # Standardize skills
+        if "skills" in result:
+            result["skills"] = self._flatten_to_list_of_strings(result["skills"])
+                
+        # Fill in missing list fields with empty lists
+        for field in ["skills", "experience", "education", "projects", "certifications"]:
+            if field not in result or result[field] is None:
+                result[field] = []
+                
+        # Ensure mandatory string fields are present
+        if "name" not in result or not result["name"]:
+            result["name"] = "Candidate"
+            
+        return result
+
+    def _sanitize_jd_dict(self, result: dict) -> dict:
+        if not isinstance(result, dict):
+            return {}
+            
+        # Standardize required_skills / preferred_skills / responsibilities / requirements / technologies
+        for field in ["required_skills", "preferred_skills", "responsibilities", "requirements", "technologies"]:
+            if field in result:
+                result[field] = self._flatten_to_list_of_strings(result[field])
+            else:
+                result[field] = []
+                
+        if "job_title" not in result or not result["job_title"]:
+            result["job_title"] = "Software Engineer"
+            
+        return result
 
 
 # Singleton instance

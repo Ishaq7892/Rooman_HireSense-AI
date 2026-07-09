@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     BACKEND_PORT: int = 8000
     FRONTEND_PORT: int = 8501
     EMBEDDING_MODEL_NAME: str = "all-MiniLM-L6-v2"
+    GROQ_MODEL_NAME: str = "llama-3.3-70b-versatile"
     LOG_LEVEL: str = "INFO"
     
     class Config:

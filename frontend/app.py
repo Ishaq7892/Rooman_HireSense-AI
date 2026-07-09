@@ -596,15 +596,17 @@ elif page == "candidate":
             
             with col2:
                 st.markdown("#### 💪 Strengths")
-                if candidate_ranked.get('strengths'):
-                    for strength in candidate_ranked['strengths']:
+                strengths = candidate_details.get('strengths') or candidate_ranked.get('strengths', [])
+                if strengths:
+                    for strength in strengths:
                         st.markdown(f"- {strength}")
                 else:
                     st.info("No strengths listed")
 
                 st.markdown("#### ⚠️ Areas for Improvement")
-                if candidate_ranked.get('weaknesses'):
-                    for weakness in candidate_ranked['weaknesses']:
+                weaknesses = candidate_details.get('weaknesses') or candidate_ranked.get('weaknesses', [])
+                if weaknesses:
+                    for weakness in weaknesses:
                         st.markdown(f"- {weakness}")
                 else:
                     st.info("No weaknesses listed")

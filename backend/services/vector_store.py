@@ -39,7 +39,7 @@ class FAISSVectorStore:
         self.embedding_dim = None
         
         # Ensure index directory exists
-        self.index_path.parent.mkdir(parents=True, exist_ok=True)
+        self.index_path.mkdir(parents=True, exist_ok=True)
         
         # Try to load existing index
         self._load_index()
