@@ -1,0 +1,156 @@
+# ==========================
+# Programming Languages
+# ==========================
+Python
+Java
+C
+C++
+C#
+Go
+Rust
+JavaScript
+TypeScript
+PHP
+Kotlin
+Swift
+R Programming
+MATLAB
+Scala
+
+# ==========================
+# Web Development
+# ==========================
+HTML
+CSS
+Bootstrap
+Tailwind CSS
+React
+Angular
+Vue.js
+Next.js
+Node.js
+Express.js
+Flask
+Django
+FastAPI
+Spring Boot
+ASP.NET
+REST API
+GraphQL
+
+# ==========================
+# Databases
+# ==========================
+SQL
+MySQL
+PostgreSQL
+SQLite
+MongoDB
+Redis
+Oracle
+Microsoft SQL Server
+Firebase
+
+# ==========================
+# Data Science & Analytics
+# ==========================
+Data Analysis
+Data Analytics
+Data Cleaning
+Data Wrangling
+Data Visualization
+Statistical Analysis
+Business Analytics
+Predictive Analytics
+Machine Learning
+Deep Learning
+Artificial Intelligence
+Generative AI
+LLM
+RLHF
+Natural Language Processing
+Computer Vision
+TensorFlow
+PyTorch
+Scikit-learn
+Pandas
+NumPy
+SciPy
+Matplotlib
+Seaborn
+Jupyter Notebook
+Power BI
+Tableau
+Looker
+Microsoft Excel
+Advanced Excel
+ETL
+Data Warehousing
+Data Mining
+Feature Engineering
+
+# ==========================
+# Cloud & DevOps
+# ==========================
+AWS
+Amazon Web Services
+Microsoft Azure
+Google Cloud Platform
+Docker
+Kubernetes
+Jenkins
+Git
+GitHub
+GitLab
+CI/CD
+Terraform
+Linux
+Bash
+Shell Scripting
+
+# ==========================
+# Software Engineering
+# ==========================
+Object Oriented Programming
+Design Patterns
+Microservices
+Agile
+Scrum
+Unit Testing
+Integration Testing
+PyTest
+Debugging
+Version Control
+
+# ==========================
+# AI / NLP
+# ==========================
+Prompt Engineering
+Prompt Design
+Fine Tuning
+Transformer Models
+BERT
+GPT
+OpenAI API
+LangChain
+RAG
+Vector Database
+FAISS
+ChromaDB
+Embeddings
+
+# ==========================
+# Soft Skills
+# ==========================
+Communication
+Problem Solving
+Critical Thinking
+Teamwork
+Leadership
+Presentation Skills
+Attention to Detail
+Time Management
+Customer Service
+Stakeholder Management
+Documentation
+Technical Writing

@@ -1,0 +1,41 @@
+Data Analyst
+
+We are looking for a Data Analyst to join our growing analytics team.
+
+Responsibilities
+
+- Collect, clean and analyze structured datasets.
+- Create dashboards and reports using Power BI and Tableau.
+- Write SQL queries to retrieve and transform data.
+- Perform exploratory data analysis and statistical analysis.
+- Work closely with business teams to provide actionable insights.
+- Automate reporting using Python.
+- Maintain data quality and accuracy.
+
+Required Skills
+
+- Data Analysis
+- SQL
+- Python
+- Microsoft Excel
+- Power BI
+- Tableau
+- Data Visualization
+- Data Cleaning
+- Statistical Analysis
+- Communication Skills
+- Problem Solving
+
+Preferred Skills
+
+- PostgreSQL
+- MySQL
+- Pandas
+- NumPy
+- Jupyter Notebook
+- Business Intelligence
+
+Qualifications
+
+Bachelor's Degree in Computer Science, Statistics,
+Information Technology or a related field.
