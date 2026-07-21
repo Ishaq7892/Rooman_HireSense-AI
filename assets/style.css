@@ -137,7 +137,86 @@ body {
     color: #c7d2fe;
 }
 
-/* Sections */
+/* Action Toolbar Buttons */
+.action-bar {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    align-items: center;
+    margin-top: 14px;
+    flex-wrap: wrap;
+}
+
+.action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 16px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.25 ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    font-family: inherit;
+}
+
+.action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
+}
+
+.btn-pdf {
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    color: #ffffff;
+    border-color: #818cf8;
+}
+
+.btn-csv {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    color: #ffffff;
+    border-color: #34d399;
+}
+
+.btn-json {
+    background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+    color: #ffffff;
+    border-color: #fbbf24;
+}
+
+/* Print Styles for PDF Export */
+@media print {
+    .no-print, .action-bar {
+        display: none !important;
+    }
+
+    body {
+        background-color: #0f172a !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color-adjust: exact !important;
+    }
+
+    .app-container {
+        width: 100% !important;
+        max-width: none !important;
+        padding: 10px !important;
+    }
+
+    .candidate-card {
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+        margin-bottom: 20px !important;
+        box-shadow: none !important;
+    }
+
+    .main-header {
+        margin-bottom: 20px !important;
+        padding: 20px !important;
+    }
+}
 .dashboard-section {
     margin-bottom: 40px;
 }

@@ -1,250 +1,335 @@
-<h1 align="center">
-  <br>
-  🤖 HireSense AI — ATS Resume Screening & Candidate Ranking Engine
-  <br>
-</h1>
+# 🤖 AI Resume Screening Agent — HireSense AI
 
-<h4 align="center">AI-Powered Resume Screening & Candidate Ranking System</h4>
+An AI-assisted Resume Screening and Ranking System that automatically screens, scores, and ranks multiple resumes against a Job Description using Natural Language Processing (NLP), skill matching, weighted scoring, and Large Language Model (LLM) reasoning.
 
-<p align="center">
-  <a href="#key-features">Key Features</a> •
-  <a href="#architecture">Architecture</a> •
-  <a href="#installation">Installation</a> •
-  <a href="#how-to-run-the-application">How to Run</a> •
-  <a href="#scoring-formula">Scoring Formula</a> •
-  <a href="#screenshots">Screenshots</a>
-</p>
+Built for the **Rooman Technologies – Junior AI Research Associate AI Agent Challenge**.
 
 ---
 
-## ✨ Key Features
+## 🚀 Project Overview
 
-- **Smart Multi-Format Resume Parsing**: Parse PDF, DOCX, and TXT candidate resumes automatically
-- **Structured Skill Extraction**: Extract technical skills, work history, and education qualifications
-- **Deterministic ATS Scoring Engine**: Calculate weighted ATS scores (50% Skill Match, 40% TF-IDF Cosine Similarity, 10% Education Match)
-- **Candidate Leaderboard & Ranking**: Rank candidates with interactive CLI leaderboard and status badges
-- **AI Assessment Summaries**: Generate comprehensive candidate evaluations (Strengths, Weaknesses, Recommendations) using Groq LLM with a robust fallback
-- **Skill Gap Analysis**: Identify matched vs missing core competencies for each candidate
-- **Professional Web Dashboard**: Modern, dark-mode responsive recruiter UI with glassmorphism aesthetics
-- **Multi-Format Export Options**: Export candidate evaluations to CSV, JSON, and interactive HTML dashboards
+Recruiters often receive hundreds of resumes for a single job opening. Manually reviewing every resume is slow, repetitive, and inconsistent.
+
+This project automates the initial screening process by:
+
+- **Parsing resumes** (PDF, DOCX, TXT)
+- **Parsing job descriptions**
+- **Extracting technical skills**
+- **Computing semantic similarity using TF-IDF**
+- **Matching candidate skills against job requirements**
+- **Calculating weighted ATS scores**
+- **Generating AI-powered recruiter summaries**
+- **Ranking all candidates automatically**
+- **Exporting professional reports**
+
+The objective is not to replace recruiters, but to help them shortlist candidates faster and more consistently.
 
 ---
 
-## 🏗️ Architecture
+## ✨ Features
 
-### System Architecture Diagram
+### Resume Processing
+- ✅ PDF Resume Parsing
+- ✅ DOCX Resume Parsing
+- ✅ TXT Resume Parsing
+- ✅ Automatic Text Cleaning
+
+### Job Description Processing
+- ✅ Job Description Parsing
+- ✅ Dynamic Skill Extraction
+- ✅ Education Detection
+- ✅ Keyword Matching
+
+### ATS Scoring Engine
+- ✅ TF-IDF Semantic Similarity
+- ✅ Dynamic Skill Matching
+- ✅ Education Score Alignment
+- ✅ Weighted Final ATS Score
+- ✅ Candidate Leaderboard Ranking
+
+### AI Features
+- ✅ AI-generated Candidate Summary
+- ✅ Strengths Identification
+- ✅ Weakness Detection
+- ✅ Hiring Recommendation
+*(Powered by Groq Llama 3.3 70B)*
+
+### Reports
+- ✅ CSV Export (`output/ranked.csv`)
+- ✅ JSON Export (`output/ranked.json`)
+- ✅ PDF Summary Export (`output/ranked_summary.pdf`)
+- ✅ Interactive HTML Report (`output/report.html`)
+
+### Engineering Features
+- ✅ Modular Project Structure
+- ✅ Automated Logging
+- ✅ Dynamic Skills Database
+- ✅ Automated Unit Tests
+- ✅ Localhost Web Dashboard Server (`server.py`)
+- ✅ Git Version Control
+
+---
+
+## 🏗 System Architecture
 
 ```
-                             Job Description (jd.txt)
-                                        │
-                                        ▼
-                         ┌─────────────────────────────┐
-                         │   Job Description Parser    │
-                         │    (utils/jd_parser.py)     │
-                         └──────────────┬──────────────┘
-                                        │
-                             Extracted Requirements
-                                        │
-                                        ▼
-┌──────────────────┐       ┌───────────────────────────┐
-│ Candidate Files  ├──────►│   Multi-Format Parser     │
-│ (PDF, DOCX, TXT) │       │   (utils/pdf_parser.py)   │
-└──────────────────┘       └────────────┬──────────────┘
-                                        │
-                             Extracted Resume Text
-                                        │
-                                        ▼
-                           ┌───────────────────────────┐
-                           │    Text Normalizer        │
-                           │   (utils/text_cleaner.py) │
-                           └────────────┬──────────────┘
-                                        │
-                                        ▼
-                           ┌───────────────────────────┐
-                           │      Resume Parser        │
-                           │  (utils/resume_parser.py) │
-                           └────────────┬──────────────┘
-                                        │
-                                        ▼
-                           ┌───────────────────────────┐
-                           │    ATS Scoring Engine     │
-                           │    (utils/scorer.py)      │
-                           │  • 50% Skill Match        │
-                           │  • 40% TF-IDF Similarity  │
-                           │  • 10% Education Match    │
-                           └────────────┬──────────────┘
-                                        │
-                                        ▼
-                           ┌───────────────────────────┐
-                           │  AI Candidate Evaluator   │
-                           │      (utils/llm.py)       │
-                           │ (Groq Llama-3.3 / Fallback)│
-                           └────────────┬──────────────┘
-                                        │
-             ┌──────────────────────────┼──────────────────────────┐
-             ▼                          ▼                          ▼
-    ┌─────────────────┐        ┌─────────────────┐        ┌─────────────────┐
-    │  output/        │        │  output/        │        │  output/        │
-    │  ranked.csv     │        │  ranked.json    │        │  report.html    │
-    └─────────────────┘        └─────────────────┘        └────────┬────────┘
-                                                                   │
-                                                                   ▼
-                                                          ┌─────────────────┐
-                                                          │  Localhost Web  │
-                                                          │  Server (5000)  │
-                                                          │  (server.py)    │
-                                                          └─────────────────┘
+                     Job Description
+                            │
+                            ▼
+                   Job Description Parser
+                            │
+                            ▼
+                  Dynamic Skill Extraction
+                            │
+                            ▼
+                     Resume Parser
+                            │
+                            ▼
+                  Text Normalization
+                            │
+                            ▼
+               TF-IDF Similarity Engine
+                            │
+                            ▼
+                  Skill Matching Engine
+                            │
+                            ▼
+                Weighted ATS Score Engine
+                            │
+                            ▼
+              AI Candidate Evaluation
+                            │
+                            ▼
+               Ranked Candidate Reports
 ```
 
-### Component Architecture & Folder Structure
+---
+
+## 📂 Project Structure
 
 ```
 HireSense_AI/
 │
-├── app.py                  # Main CLI execution engine & report coordinator
-├── server.py               # Localhost web server script (http://localhost:5000)
+├── app.py                  # Main screening engine & CLI launcher
+├── server.py               # Localhost web server (http://localhost:5000)
 ├── config.py               # Environment configuration loader
-├── requirements.txt        # Core project dependencies
-├── .env                    # Groq API Key configuration
-├── README.md               # Project documentation
+├── requirements.txt        # Core dependencies
+├── README.md               # Documentation
+├── .gitignore
+├── pytest.ini
 │
 ├── job_description/
-│   └── jd.txt              # Target job description input file
+│   └── jd.txt              # Target job description input
 │
 ├── resumes/
-│   └── *.pdf, *.docx, *.txt# Candidate resumes folder
+│   ├── *.pdf
+│   ├── *.docx
+│   └── *.txt               # Candidate resumes folder
+│
+├── output/
+│   ├── ranked.csv          # Candidate dataset CSV export
+│   ├── ranked.json         # Candidate evaluation JSON export
+│   ├── ranked_summary.pdf  # Candidate ranking PDF summary
+│   └── report.html         # Interactive recruiter HTML dashboard
 │
 ├── sample_data/
 │   └── skills.txt          # Technical skill database taxonomy
 │
 ├── templates/
-│   └── report_template.html# Recruiter dashboard HTML layout template
+│   └── report_template.html# Dashboard HTML template
 │
 ├── assets/
-│   └── style.css           # Recruiter dashboard CSS stylesheet
+│   ├── style.css           # Dashboard stylesheet
+│   └── *.png               # Screenshot assets
 │
-├── utils/                  # Core Processing & Engine Modules
-│   ├── jd_parser.py        # Extracts job requirements, skills, and education criteria
-│   ├── resume_parser.py    # Extracts candidate skills, work history, and education
-│   ├── pdf_parser.py       # Reads PDF (PyMuPDF), DOCX (python-docx), and TXT files
-│   ├── text_cleaner.py     # Cleans and normalizes raw text using RegEx
-│   ├── skills_loader.py    # Caches and loads technical skills taxonomy
-│   ├── scorer.py           # Calculates TF-IDF similarity, skill match %, & ATS scores
-│   ├── llm.py              # Generates AI candidate summaries (Groq Llama-3.3 + Fallback)
-│   ├── exporter.py         # Exports evaluation results to CSV, JSON, and HTML
-│   └── logger.py           # System logging module
+├── tests/
+│   ├── test_jd_parser.py
+│   ├── test_resume_parser.py
+│   ├── test_scorer.py
+│   └── test_skills_loader.py
 │
-├── tests/                  # Automated Unit Test Suite
-│   ├── test_jd_parser.py   # Unit tests for JD parser module
-│   ├── test_resume_parser.py # Unit tests for resume parser module
-│   ├── test_scorer.py      # Unit tests for ATS scoring engine
-│   └── test_skills_loader.py # Unit tests for skill database loader
-│
-└── output/                 # Generated Output Artifacts
-    ├── ranked.csv          # Exported candidate leaderboard CSV dataset
-    ├── ranked.json         # Exported candidate leaderboard JSON payload
-    └── report.html         # Generated interactive recruiter web dashboard
+└── utils/
+    ├── __init__.py
+    ├── exporter.py         # CSV, JSON, PDF, HTML exporters
+    ├── jd_parser.py        # Job description parser
+    ├── llm.py              # Groq AI evaluator & fallback
+    ├── logger.py           # Logging module
+    ├── pdf_parser.py       # Multi-format PDF/DOCX/TXT text extractor
+    ├── resume_parser.py    # Resume parser
+    ├── scorer.py           # ATS weighted scoring engine
+    ├── skills_loader.py    # Skill database cache manager
+    └── text_cleaner.py     # RegEx text normalizer
 ```
 
 ---
 
-## ⚙️ Installation
+## 🛠 Tech Stack
 
-### Requirements
-- Python 3.10 or higher
-- pip
-- A Groq API key (optional — built-in structured evaluation engine fallback included)
-
-### Step-by-Step Setup
-
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/Ishaq7892/Rooman_HireSense-AI.git
-   cd HireSense_AI
-   ```
-
-2. **Create a virtual environment**
-   ```bash
-   python -m venv .venv
-   ```
-
-3. **Activate the virtual environment**
-   - Windows (PowerShell):
-     ```bash
-     .venv\Scripts\activate
-     ```
-   - Linux / macOS:
-     ```bash
-     source .venv/bin/activate
-     ```
-
-4. **Install dependencies**
-   ```bash
-   pip install -r requirements.txt
-   ```
+| Category | Technology |
+| :--- | :--- |
+| **Language** | Python 3.10+ |
+| **AI** | Groq Llama 3.3 70B |
+| **NLP** | TF-IDF Vectorization |
+| **ML / Math** | Scikit-Learn |
+| **PDF Generation** | ReportLab |
+| **PDF Parsing** | PyMuPDF (`fitz`) |
+| **DOCX Parsing** | `python-docx` |
+| **Data Handling** | Pandas |
+| **CLI Styling** | Rich |
+| **Testing** | Unittest / Pytest |
 
 ---
 
-## 🔧 Environment Variables
+## ⚙ Installation
 
-Create or configure a `.env` file in the root directory:
+### 1. Clone the repository
+```bash
+git clone https://github.com/Ishaq7892/Rooman_HireSense-AI.git
+cd HireSense_AI
+```
+
+### 2. Create virtual environment
+```bash
+python -m venv .venv
+```
+
+### 3. Activate virtual environment
+- **Windows (PowerShell / CMD)**:
+  ```bash
+  .venv\Scripts\activate
+  ```
+- **Linux / macOS**:
+  ```bash
+  source .venv/bin/activate
+  ```
+
+### 4. Install dependencies
+```bash
+pip install -r requirements.txt
+```
+
+---
+
+## 🔑 Configuration
+
+Create a `.env` file in the root directory:
 
 ```env
-# Groq API Configuration
-GROQ_API_KEY=your_groq_api_key_here
+GROQ_API_KEY=YOUR_GROQ_API_KEY
 ```
 
-> 💡 **Note**: If `GROQ_API_KEY` is omitted, HireSense AI automatically utilizes a built-in structured evaluation engine fallback so all evaluations run seamlessly.
+> 💡 *Note: If `GROQ_API_KEY` is omitted, the engine automatically uses a built-in structured evaluation engine fallback so all evaluations execute seamlessly.*
 
 ---
 
-## 🚀 How to Run the Application
+## ▶ Running
 
-### 1. Run Candidate Resume Screening & Open Dashboard
+### Step 1: Run Candidate Screening
 ```bash
 python app.py
 ```
-- Parses `job_description/jd.txt` and candidate resumes in `resumes/`.
-- Computes weighted ATS scores, skill gaps, and AI recruiter evaluations.
-- Displays an interactive leaderboard in terminal.
-- Exports `output/ranked.csv`, `output/ranked.json`, and `output/report.html`.
-- **Automatically opens `output/report.html` in your default browser**.
+The application will:
+1. Parse the Job Description (`job_description/jd.txt`)
+2. Parse every resume in `resumes/`
+3. Clean and normalize text
+4. Extract required skills
+5. Compute TF-IDF similarity
+6. Match candidate skills
+7. Calculate weighted ATS scores
+8. Generate AI explanations & recommendations
+9. Rank all candidates automatically
+10. Export reports to `output/` and open `output/report.html` in your default browser
 
-### 2. Host Localhost Web Dashboard (`http://localhost:5000`)
+### Step 2: Host Localhost Web Server
 ```bash
 python server.py
 ```
-- Hosts the web dashboard live at **`http://localhost:5000`**.
-- Handles dynamic port selection automatically if port 5000 is occupied.
+Hosts the interactive dashboard live at **`http://localhost:5000`**.
 
-### 3. Run Automated Unit Tests
+---
+
+## 🧪 Running Tests
+
+Run unit tests using unittest or pytest:
+
 ```bash
 python -m unittest discover -s tests
+```
+or
+```bash
+pytest
 ```
 
 ---
 
-## 📊 Scoring Formula
+## 📊 Scoring Methodology
 
-The candidate **Final ATS Score** is calculated deterministically:
-
-$$\text{Final Score} = (\text{Skill Match Score} \times 0.50) + (\text{TF-IDF Similarity} \times 0.40) + (\text{Education Match} \times 0.10)$$
+The ATS score combines three weighted components:
 
 | Component | Weight | Description |
-|-----------|--------|-------------|
-| **Skill Match** | **50%** | Match ratio of candidate skills against JD required skills |
+| :--- | :---: | :--- |
+| **Skill Match** | **50%** | Ratio of matched candidate skills against required JD skills |
 | **TF-IDF Similarity** | **40%** | Cosine similarity between resume text and job description term vectors |
-| **Education Match** | **10%** | 100% if required degree qualification is matched, else 0% |
+| **Education Match** | **10%** | Degree qualification match score |
 
-### Candidate Recommendation Badges
-- **🟢 Highly Recommended**: ATS Score $\ge 85\%$
-- **🔵 Recommended**: ATS Score $\ge 70\%$
-- **🟡 Consider**: ATS Score $\ge 50\%$
-- **🔴 Not Recommended**: ATS Score $< 50\%$
+The weighted score determines the final candidate ranking and recommendation status:
+- 🟢 **Highly Recommended**: Score $\ge 85\%$
+- 🔵 **Recommended**: Score $\ge 70\%$
+- 🟡 **Consider**: Score $\ge 50\%$
+- 🔴 **Not Recommended**: Score $< 50\%$
 
 ---
 
-## 📈 Screenshots
+## 📤 Output
+
+The application generates:
+
+```
+output/
+│
+├── ranked.csv
+├── ranked.json
+├── ranked_summary.pdf
+└── report.html
+```
+
+The terminal displays:
+- Candidate Rank
+- Final ATS Score
+- TF-IDF Match % | Skill Match % | Education Match %
+- Matched Skills
+- Missing Skills
+- AI Evaluation (Strengths, Weaknesses, Recommendation)
+
+---
+
+## 🧠 AI Integration
+
+This project integrates the Groq API using the **Llama 3.3 70B** model.
+
+The LLM is not responsible for raw score calculation, ensuring that ATS scoring remains deterministic while using AI for explainability.
+
+It provides human-readable explanations including:
+- Candidate strengths
+- Candidate weaknesses
+- Hiring recommendation
+
+---
+
+## 📈 Future Improvements
+
+- [ ] Interactive Recruiter Dashboard UI
+- [ ] Resume Upload Web Drag & Drop
+- [ ] Sentence Transformer Embeddings
+- [ ] Semantic Skill Matching
+- [ ] Experience Timeline Analysis
+- [ ] Recruiter Feedback Loop
+- [ ] GitHub Actions CI/CD Pipeline
+- [ ] Docker Support
+
+---
+
+## 📸 Screenshots
 
 ### HTML Report
 ![HTML Report](assets/html_report.png)
@@ -253,55 +338,42 @@ $$\text{Final Score} = (\text{Skill Match Score} \times 0.50) + (\text{TF-IDF Si
 ![Candidate Ranking](assets/rankings.png)
 
 ### Project Folder
-![Candidate Details](assets/project_structure.png)
+![Project Folder](assets/project_structure.png)
 
 ### GitHub Repository
-![Upload job discription](assets/GitHub-Account.png)
+![GitHub Repository](assets/GitHub-Account.png)
 
 ### Terminal Output
-![Upload Resume](assets/terminal_output1.png)
-![Recruitment Analiysis](assets/terminal_output2.png)
+![Terminal Output 1](assets/terminal_output1.png)
+![Terminal Output 2](assets/terminal_output2.png)
 
 ### Unit Tests
-![Skill Gap](assets/Test.png)
+![Unit Tests](assets/Test.png)
 
 ---
 
-## 🚀 Future Improvements
+## ⚠️ Known Limitations
 
-- [ ] Persistent database (PostgreSQL/MongoDB) instead of in-memory
-- [ ] User authentication & multi-user support
-- [ ] Cloud deployment (AWS/GCP/Azure)
-- [ ] Batch processing for large volumes of resumes
-- [ ] Customizable scoring weights via UI
-- [ ] Email notifications for recruiter teams
-- [ ] ATS platform integrations (Greenhouse, Lever, etc.)
-- [ ] Multi-language support
+- Uses TF-IDF for term-frequency matching alongside technical skill extraction.
+- Skill matching relies on taxonomy term extraction.
+- Job descriptions are parsed using rule-based extraction.
 
 ---
 
-## 📜 License
+## 👨‍💻 Author
 
-This project is open source and available under the MIT License.
-
----
-
-## 🤝 Contributing
-
-Contributions, issues, and feature requests are welcome! Feel free to check issues or submit pull requests.
+**Ishaq Gaima**  
+*HireSense AI — AI Resume Screening Agent*  
+Built for the **Rooman Technologies – Junior AI Research Associate AI Agent Challenge**.
 
 ---
 
-## 🙏 Acknowledgments
+## ⭐ Acknowledgements
 
-- **Rooman Technologies**: For hosting the Junior AI Research Associate Challenge
-- **Groq**: For providing LLM API acceleration
-- **Scikit-Learn**: For TF-IDF vectorization and cosine similarity matching
-- **Rich**: For terminal output formatting
-
----
-
-<p align="center">
-  Made with ❤️ for Junior AI Research Associate AI Agent Challenge
-</p>
-
+This project was developed to demonstrate practical skills in:
+- Artificial Intelligence & LLM Integration
+- Natural Language Processing (NLP)
+- Python Software Engineering
+- Resume Screening Automation & ATS Engines
+- Prompt Engineering & Fallback Systems
+- Software Testing & Modular Architecture

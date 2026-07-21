@@ -45,6 +45,117 @@ def export_to_json(results: list, output_path: str):
         logger.error(f"JSON export failed: {e}")
 
 
+def export_to_pdf(results: list, output_path: str):
+    """
+    Generate clean Candidate Ranking PDF summary document.
+    """
+    try:
+        from reportlab.lib.pagesizes import letter
+        from reportlab.lib import colors
+        from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+        from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+
+        doc = SimpleDocTemplate(
+            output_path,
+            pagesize=letter,
+            rightMargin=36,
+            leftMargin=36,
+            topMargin=36,
+            bottomMargin=36
+        )
+
+        styles = getSampleStyleSheet()
+
+        title_style = ParagraphStyle(
+            'DocTitle',
+            parent=styles['Heading1'],
+            fontSize=18,
+            leading=22,
+            textColor=colors.HexColor('#1e1b4b'),
+            spaceAfter=4
+        )
+
+        subtitle_style = ParagraphStyle(
+            'DocSubtitle',
+            parent=styles['Normal'],
+            fontSize=10,
+            textColor=colors.HexColor('#475569'),
+            spaceAfter=12
+        )
+
+        cell_style = ParagraphStyle(
+            'CellText',
+            parent=styles['Normal'],
+            fontSize=9,
+            leading=11,
+            textColor=colors.HexColor('#0f172a')
+        )
+
+        cell_header_style = ParagraphStyle(
+            'CellHeader',
+            parent=styles['Normal'],
+            fontSize=9,
+            leading=11,
+            fontName='Helvetica-Bold',
+            textColor=colors.white
+        )
+
+        elements = []
+
+        elements.append(Paragraph("🤖 HireSense AI — Candidate Ranking Summary", title_style))
+        elements.append(Paragraph(f"Generated on {datetime.now().strftime('%B %d, %Y at %I:%M %p')} | Total Candidates Evaluated: {len(results)}", subtitle_style))
+        elements.append(Spacer(1, 8))
+
+        table_data = [
+            [
+                Paragraph("Rank", cell_header_style),
+                Paragraph("Candidate Resume File", cell_header_style),
+                Paragraph("Status", cell_header_style),
+                Paragraph("ATS Score", cell_header_style),
+                Paragraph("Matched Skills", cell_header_style),
+            ]
+        ]
+
+        for candidate in results:
+            rank_str = f"#{candidate.get('rank', '-')}"
+            filename = candidate.get('resume_file', 'Unknown')
+            status = candidate.get('status', '-')
+            score = f"{candidate.get('final_score', 0)}%"
+
+            matched_list = candidate.get('matched_skills', [])
+            matched_str = ", ".join(matched_list) if matched_list else "None"
+            matched_text = f"({candidate.get('matched_skill_count', 0)}/{candidate.get('required_skill_count', 0)}) {matched_str}"
+
+            status_color = "#059669" if "Highly" in status or status == "Recommended" else ("#d97706" if status == "Consider" else "#e11d48")
+
+            table_data.append([
+                Paragraph(f"<b>{rank_str}</b>", cell_style),
+                Paragraph(filename, cell_style),
+                Paragraph(f"<font color='{status_color}'><b>{status}</b></font>", cell_style),
+                Paragraph(f"<b>{score}</b>", cell_style),
+                Paragraph(matched_text, cell_style),
+            ])
+
+        table = Table(table_data, colWidths=[40, 130, 110, 65, 195])
+        table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1e293b')),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+            ('TOPPADDING', (0, 0), (-1, -1), 6),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#cbd5e1')),
+            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#f8fafc')]),
+        ]))
+
+        elements.append(table)
+        doc.build(elements)
+        logger.info(f"PDF summary exported to {output_path}")
+
+    except Exception as e:
+        logger.error(f"PDF export failed: {e}")
+
+
 def export_to_html(results: list, output_path: str):
     """
     Generate modern recruiter dashboard HTML report.

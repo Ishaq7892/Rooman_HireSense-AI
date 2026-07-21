@@ -8,6 +8,7 @@ numpy>=1.26.0
 # AI & Environment
 groq>=0.30.0
 python-dotenv>=1.0.0
+reportlab>=5.0.0
 
 # Terminal UI & Web Server
 rich>=13.7.0

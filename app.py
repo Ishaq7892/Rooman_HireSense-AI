@@ -17,6 +17,7 @@ from utils.exporter import (
     export_to_csv,
     export_to_json,
     export_to_html,
+    export_to_pdf,
 )
 
 try:
@@ -194,9 +195,11 @@ def main():
 
     # Export Reports
     report_file = Path("output/report.html").resolve()
+    pdf_file = Path("output/ranked_summary.pdf").resolve()
     export_to_csv(results, "output/ranked.csv")
     export_to_json(results, "output/ranked.json")
     export_to_html(results, str(report_file))
+    export_to_pdf(results, str(pdf_file))
 
     # Open HTML Dashboard in Google Chrome / Default Browser automatically
     try:
@@ -209,12 +212,14 @@ def main():
         rprint("\n[bold green]✅ Generated Reports:[/bold green]")
         rprint("  📄 [dim]output/ranked.csv[/dim]")
         rprint("  📦 [dim]output/ranked.json[/dim]")
+        rprint("  📕 [dim]output/ranked_summary.pdf[/dim]")
         rprint(f"  🌐 [bold cyan]{report_file.as_uri()}[/bold cyan]")
         rprint("\n[bold cyan]🚀 Opening Candidate Screening Dashboard in Chrome/Browser...[/bold cyan]\n")
     else:
         print("\nGenerated Files:")
         print("✓ output/ranked.csv")
         print("✓ output/ranked.json")
+        print("✓ output/ranked_summary.pdf")
         print(f"✓ {report_file.as_uri()}")
         print("\n" + "=" * 60)
         print("Opening Candidate Screening Dashboard in Browser...")
